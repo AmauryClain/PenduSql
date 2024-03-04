@@ -1,9 +1,3 @@
-<!-- Afficher le score de 3 manières différentes :
-- ordre alph des noms de joueurs
-- par score décroissant
--Par niveau de difficulté (Difficile en premier, moyen en second et facile en 3ème) puis par score 
-décroissant
-afficher : nom, difficulté, nombre de parties gg en fonction de la difficulté -->
 <?php
 include 'elements/header.php';
 include 'connexion.php';
@@ -45,36 +39,26 @@ $stmt = $mysqlClient->prepare("SELECT players.pla_name, player_stats.pls_difficu
 $stmt->execute();
 $scoresDiff = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-
-
-
 ?>
 <a class="btn btn-primary" href="home.php" role="button">Retour</a>
 
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="alphabeticalCheckbox" checked>
-    <label class="form-check-label" for="alphabeticalCheckbox">
-        Afficher/dissimuler l'ordre alphabétique des noms de joueurs
-    </label>
+<div class="form-check form-switch " id="namediv">
+    <input class="form-check-input" type="checkbox" role="switch" name="nameCheck" id="nameCheck" onclick="nameCheck()" checked>
+    <label class="form-check-label" for="nameCheck">Tri par nom</label>
+</div>
+<div class="form-check form-switch" id="windiv">
+    <input class="form-check-input" type="checkbox" role="switch" name="winCheck" id="winCheck" onclick="winCheck()">
+    <label class="form-check-label" for="winCheck">Tri par score</label>
+</div>
+<div class="form-check form-switch" id="diffdiv">
+    <input class="form-check-input" type="checkbox" role="switch" name="diffCheck" id="diffCheck" onclick="diffCheck()">
+    <label class="form-check-label" for="diffCheck" name="diffCheck" type="submit">Tri par difficulté</label>
 </div>
 
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="scoreCheckbox" checked>
-    <label class="form-check-label" for="scoreCheckbox">
-        Afficher/dissimuler le score décroissant
-    </label>
-</div>
 
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" id="difficultyCheckbox" checked>
-    <label class="form-check-label" for="difficultyCheckbox">
-        Afficher/dissimuler par niveau de difficulté
-    </label>
-</div>
 <!-- Tableau alphabétique -->
-<table id="alphabeticalTable" class="table">
+<table id="nameTable" class="table">
     <thead>
-        <p>Tri par nom de joueur</p>
         <tr>
             <th>Nom du joueur</th>
             <th>Difficulté</th>
@@ -93,9 +77,8 @@ $scoresDiff = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </table>
 
 <!-- Tableau de score -->
-<table id="scoreTable" class="table">
+<table style="display: none;" id="winTable" class="table">
     <thead>
-        <p>Tri par score</p>
         <tr>
             <th>Nom du joueur</th>
             <th>Difficulté</th>
@@ -114,9 +97,8 @@ $scoresDiff = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </table>
 
 <!-- Tableau par niveau de difficulté -->
-<table id="difficultyTable" class="table">
+<table style="display: none;" id="diffTable" class="table">
     <thead>
-        <p>Tri par niveau de difficulté</p>
         <tr>
             <th>Nom du joueur</th>
             <th>Difficulté</th>
@@ -133,6 +115,77 @@ $scoresDiff = $stmt->fetchAll(PDO::FETCH_ASSOC);
         <?php endforeach; ?>
     </tbody>
 </table>
+
+<script>
+    function nameCheck() {
+        // checkbox
+        var checkBox = document.getElementById("nameCheck");
+        // affichage
+        var form = document.getElementById("nameTable");
+        // éléments à cacher
+        var memberCheck = document.getElementById("winCheck");
+        var albumCheck = document.getElementById("diffCheck");
+        var memberform = document.getElementById("winTable");
+        var albumform = document.getElementById("diffTable");
+
+        if (checkBox.checked == true) {
+            form.style.display = "block";
+            memberCheck.checked = false;
+            albumCheck.checked = false;
+            memberform.style.display = "none";
+            albumform.style.display = "none";
+
+        } else {
+            form.style.display = "none";
+        }
+    }
+
+    function winCheck() {
+        // checkbox
+        var checkBox = document.getElementById("winCheck");
+        // affichage
+        var form = document.getElementById("winTable");
+        // éléments à cacher
+        var groupCheck = document.getElementById("nameCheck");
+        var albumCheck = document.getElementById("diffCheck");
+        var groupform = document.getElementById("nameTable");
+        var albumform = document.getElementById("diffTable");
+
+        if (checkBox.checked == true) {
+            form.style.display = "block";
+            groupCheck.checked = false;
+            albumCheck.checked = false;
+            groupform.style.display = "none";
+            albumform.style.display = "none";
+
+        } else {
+            form.style.display = "none";
+        }
+    }
+
+    function diffCheck() {
+        // checkbox
+        var checkBox = document.getElementById("diffCheck");
+        // affichage
+        var form = document.getElementById("diffTable");
+        // éléments à cacher
+        var groupCheck = document.getElementById("nameCheck");
+        var memberCheck = document.getElementById("winCheck");
+        var groupform = document.getElementById("nameTable");
+        var memberform = document.getElementById("winTable");
+
+        if (checkBox.checked == true) {
+            form.style.display = "block";
+            groupCheck.checked = false;
+            memberCheck.checked = false;
+            groupform.style.display = "none";
+            memberform.style.display = "none";
+
+        } else {
+            form.style.display = "none";
+        }
+    }
+</script>
 
 <?php
 

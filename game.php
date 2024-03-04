@@ -163,6 +163,129 @@ function restartGame()
     exit();
 }
 
+// Fonction pour dessiner le pendu en fonction du nombre de tentatives restantes
+function drawHangman($triesLeft)
+{
+    switch ($triesLeft) {
+        case 8:
+            echo "<pre>
+      </pre>";
+            break;
+        case 7:
+            echo "<pre>
+                    _______
+                   |       |
+                   |       
+                   |      
+                   |        
+                   |       
+                 __|__
+                |     |______
+                |            |
+                |____________|
+              </pre>";
+            break;
+        case 6:
+            echo "<pre>
+                    _______
+                   |       |
+                   |       O
+                   |      
+                   |        
+                   |       
+                 __|__
+                |     |______
+                |            |
+                |____________|
+              </pre>";
+            break;
+        case 5:
+            echo "<pre>
+                    _______
+                   |       |
+                   |       O
+                   |       |
+                   |        
+                   |       
+                 __|__
+                |     |______
+                |            |
+                |____________|
+              </pre>";
+            break;
+        case 4:
+            echo "<pre>
+                    _______
+                   |       |
+                   |       O
+                   |      /|
+                   |        
+                   |       
+                 __|__
+                |     |______
+                |            |
+                |____________|
+              </pre>";
+            break;
+        case 3:
+            echo "<pre>
+                    _______
+                   |       |
+                   |       O
+                   |      /|\
+                   |        
+                   |       
+                 __|__
+                |     |______
+                |            |
+                |____________|
+              </pre>";
+            break;
+        case 2:
+            echo "<pre>
+                    _______
+                   |       |
+                   |       O
+                   |      /|\
+                   |      / 
+                   |       
+                 __|__
+                |     |______
+                |            |
+                |____________|
+              </pre>";
+            break;
+        case 1:
+            echo "<pre>
+                    _______
+                   |       |
+                   |       O
+                   |      /|\
+                   |      / \
+                   |       
+                 __|__
+                |     |______
+                |            |
+                |____________|
+              </pre>";
+            break;
+        case 0:
+            echo "<pre>
+                    _______
+                   |       |
+                   |       O
+                   |      /|\
+                   |      / \
+                   |       
+                 __|__
+                |     |______
+                |            |
+                |____________|
+              </pre>";
+            break;
+    }
+}
+
 // Check if the restart button was clicked
 if (isset($_POST['restart']) && $_POST['restart'] === "true") {
     // Reset session variables
@@ -200,6 +323,8 @@ if (isset($_POST['restart']) && $_POST['restart'] === "true") {
     <!-- Add game UI elements here -->
     <div class="displayGame">
         <!-- Input field for the player to guess a letter -->
+        <!-- Dessiner le pendu en fonction du nombre de tentatives restantes -->
+        <?php drawHangman($try); ?>
         <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
             <input type="hidden" name="playerName" value="<?php echo htmlspecialchars($playerName); ?>">
             <input type="hidden" name="difficultyLevel" value="<?php echo htmlspecialchars($difficultyLevel); ?>">

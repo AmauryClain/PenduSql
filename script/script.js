@@ -4,7 +4,6 @@ function getDifficulty(level) {
   return levelDifficulty;
 }
 
-// Fonction pour afficher ou cacher un tableau en fonction de l'état de la case à cocher
 function toggleTable(tableId, checkboxId) {
   const table = document.getElementById(tableId);
   const checkbox = document.getElementById(checkboxId);
