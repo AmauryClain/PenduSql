@@ -11,7 +11,7 @@ $stmt = $mysqlClient->prepare("SELECT players.pla_name, player_stats.pls_difficu
     limit 10");
 $stmt->execute();
 $scoresName = $stmt->fetchAll(PDO::FETCH_ASSOC);
-// trier par nombre de parties gagnées
+// trier par nombre de parties gagnees
 $stmt = $mysqlClient->prepare("SELECT players.pla_name, player_stats.pls_difficulty, COUNT(player_stats.pls_win) AS total_wins
     FROM player_stats 
     JOIN players ON player_stats.pla_id = players.pla_id 
@@ -22,7 +22,7 @@ $stmt = $mysqlClient->prepare("SELECT players.pla_name, player_stats.pls_difficu
 $stmt->execute();
 $scoresWin = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// trier par niveau de difficulté (Difficile en premier, moyen en second et facile en 3ème) puis par score décroissant
+// trier par niveau de difficulte (Difficile en premier, moyen en second et facile en 3eme) puis par score décroissant
 $stmt = $mysqlClient->prepare("SELECT players.pla_name, player_stats.pls_difficulty, COUNT(player_stats.pls_win) AS total_wins
     FROM player_stats 
     JOIN players ON player_stats.pla_id = players.pla_id 
@@ -56,7 +56,7 @@ $scoresDiff = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </div>
 
 
-<!-- Tableau alphabétique -->
+<!-- tableau par nom -->
 <table id="nameTable" class="table">
     <thead>
         <tr>
@@ -76,7 +76,7 @@ $scoresDiff = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </tbody>
 </table>
 
-<!-- Tableau de score -->
+<!-- tableau par wins -->
 <table style="display: none;" id="winTable" class="table">
     <thead>
         <tr>
@@ -96,7 +96,7 @@ $scoresDiff = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </tbody>
 </table>
 
-<!-- Tableau par niveau de difficulté -->
+<!-- tableau par niveau de difficulte -->
 <table style="display: none;" id="diffTable" class="table">
     <thead>
         <tr>

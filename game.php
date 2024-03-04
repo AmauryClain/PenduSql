@@ -3,70 +3,71 @@ session_start();
 include 'elements/header.php';
 include 'connexion.php';
 
-// Retrieve the difficulty level from the session
+// recupere le niveau de difficulté grace a la session
 $difficultyLevel = $_SESSION['difficultyLevel'];
 
-// Initialize variables
+// initialiser les variables
 $playerCreated = false;
 $try = isset($_SESSION['try']) ? $_SESSION['try'] : 8;
 $gameResult = isset($_SESSION['gameResult']) ? $_SESSION['gameResult'] : null;
 
-// Check if the random word is already generated and stored in the session
+// verifie si un mot a deja ete choisis
 if (isset($_SESSION['randomWord'])) {
     $randomWord = $_SESSION['randomWord'];
     $hiddenWordArray = $_SESSION['hiddenWordArray'];
     $hiddenWordString = $_SESSION['hiddenWordString'];
 } else {
-    // Generate a new random word if not already generated
+    // genere un nouveau mot si aucun mot n'a ete genere
     if ($difficultyLevel == "easy") {
+        $min_length = 0;
         $max_length = 6;
     } elseif ($difficultyLevel == "medium") {
+        $min_length = 6;
         $max_length = 8;
     } elseif ($difficultyLevel == "hard") {
+        $min_length = 8;
         $max_length = 25;
     }
-
-    $stmt = $mysqlClient->prepare('SELECT w.wrd_word FROM words w WHERE CHAR_LENGTH(w.wrd_word) <= ?');
-    $stmt->execute([$max_length]);
+    $stmt = $mysqlClient->prepare('SELECT w.wrd_word FROM words w WHERE CHAR_LENGTH(w.wrd_word) <= ? and char_length(w.wrd_word) > ?');
+    $stmt->execute([$max_length, $min_length]);
     $words = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Generate a random index to choose a random word
+    // genere un index aleatoire pour choisir un mot aleatoire
     $randomIndex = array_rand($words);
 
-    // Retrieve the random word and clean it
+    // recupere le mot
     $randomWord = $words[$randomIndex]['wrd_word'];
-    $randomWord = iconv('UTF-8', 'ASCII//TRANSLIT', $randomWord); // Remove accents and special characters
-    $randomWord = strtoupper($randomWord); // Convert to uppercase
+    $randomWord = iconv('UTF-8', 'ASCII//TRANSLIT', $randomWord); // enleve les caracteres speciaux
+    $randomWord = strtoupper($randomWord); // convertir le mot en majuscule
 
-    // Create an array to store the hidden word
+    // tableau d'underscore
     $hiddenWordArray = array_fill(0, strlen($randomWord), '_');
 
-    // Convert the hidden word array to string
+    // transforme le tableau en chaine de caractere
     $hiddenWordString = implode(" ", $hiddenWordArray);
 
-    // Store the random word and hidden word array in the session
+    // stocke le mot choisi et le tableau d'underscore dans la session
     $_SESSION['randomWord'] = $randomWord;
     $_SESSION['hiddenWordArray'] = $hiddenWordArray;
     $_SESSION['hiddenWordString'] = $hiddenWordString;
 }
 
-// Process the form to save the player name in the database and start the game
+// demande le nom et stocke le nom dans la bdd
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['playerName'])) {
     $playerName = $_POST['playerName'];
 
-    // Check if the player name is not empty
+    // verifie si le joueur existe deja
     if (!empty($playerName)) {
-        // Check if the player name already exists in the database
         $stmt = $mysqlClient->prepare("SELECT pla_id FROM players WHERE pla_name = ?");
         $stmt->execute([$playerName]);
         $playerId = $stmt->fetchColumn();
 
         if ($playerId) {
-            // Player already exists, retrieve the player ID
+            // le joueur existe deja, on recupere son ID
             $_SESSION['playerId'] = $playerId;
             $playerCreated = true;
         } else {
-            // Insert the player name into the database
+            // insere le joueur en bdd
             $stmt = $mysqlClient->prepare("INSERT INTO players (pla_name) VALUES (?)");
             $stmt->execute([$playerName]);
             $playerId = $mysqlClient->lastInsertId();
@@ -74,52 +75,56 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['playerName'])) {
             $playerCreated = true;
         }
     } else {
-        // Player name is empty, handle accordingly (e.g., display an error message)
         echo "Player name cannot be empty!";
     }
 }
 
-// Check if a letter has been guessed
+// tableau pour stocker les lettres utilisees
+$lettersTried = isset($_SESSION['lettersTried']) ? $_SESSION['lettersTried'] : array();
+
+// verifie les lettres entrees
 if (isset($_POST['guessedLetter'])) {
     $guessedLetter = strtoupper($_POST['guessedLetter']);
-
-    // Check if the guessed letter is present in the random word
-    if (strpos($randomWord, $guessedLetter) !== false) {
-        // Update the hidden word array to reveal the correctly guessed letters
-        for ($i = 0; $i < strlen($randomWord); $i++) {
-            if ($randomWord[$i] == $guessedLetter) {
-                $hiddenWordArray[$i] = $guessedLetter;
-            }
-        }
+    // verifie si la lettre a deja ete utilisee
+    if (in_array($guessedLetter, $lettersTried)) {
     } else {
-        // Decrease the number of remaining tries if the guessed letter is incorrect
-        $try--;
+        $lettersTried[] = $guessedLetter;
+        // verifie si la lettre est presente dans le mot
+        if (strpos($randomWord, $guessedLetter) !== false) {
+            // met a jour le tableau d'underscore
+            for ($i = 0; $i < strlen($randomWord); $i++) {
+                if ($randomWord[$i] == $guessedLetter) {
+                    $hiddenWordArray[$i] = $guessedLetter;
+                }
+            }
+        } else {
+            // met a jour le nombre d'essais
+            $try--;
+        }
+        $hiddenWordString = implode(" ", $hiddenWordArray);
+
+        // met a jour les variables de session
+        $_SESSION['hiddenWordArray'] = $hiddenWordArray;
+        $_SESSION['hiddenWordString'] = $hiddenWordString;
+        $_SESSION['try'] = $try;
+        $_SESSION['lettersTried'] = $lettersTried;
     }
-
-    // Convert the updated hidden word array to string
-    $hiddenWordString = implode(" ", $hiddenWordArray);
-
-    // Update the session variables
-    $_SESSION['hiddenWordArray'] = $hiddenWordArray;
-    $_SESSION['hiddenWordString'] = $hiddenWordString;
-    $_SESSION['try'] = $try;
 }
 
-// Check for winning condition
+
+// victoire
 if (!in_array('_', $hiddenWordArray)) {
-    // Player has guessed all letters correctly
     $gameResult = "win";
     $_SESSION['gameResult'] = $gameResult;
 }
 
-// Check for losing condition
+// defaite
 if ($try === 0) {
-    // Player has run out of tries
     $gameResult = "lose";
     $_SESSION['gameResult'] = $gameResult;
 }
 
-// Function to save game data
+// fonction pour envoyer les variables en bdd
 function saveGameData($winStatus, $difficultyLevel, $playerId, $date)
 {
     global $mysqlClient;
@@ -132,23 +137,16 @@ function saveGameData($winStatus, $difficultyLevel, $playerId, $date)
     return true;
 }
 
-// Function to reset session variables and redirect to home.php
+// relancer une partie et reinitialiser la session
 function restartGame()
 {
     global $mysqlClient;
-
-    // Get current date and time
     $date = date('Y-m-d H:i:s');
-
-    // Retrieve player ID from session
     $playerId = isset($_SESSION['playerId']) ? $_SESSION['playerId'] : null;
-
-    // Save game data to the database before resetting session
     if ($_SESSION['gameResult'] === "win" || $_SESSION['gameResult'] === "lose") {
         saveGameData($_SESSION['gameResult'], $_SESSION['difficultyLevel'], $playerId, $date);
     }
 
-    // Unset session variables
     unset($_SESSION['randomWord']);
     unset($_SESSION['hiddenWordArray']);
     unset($_SESSION['hiddenWordString']);
@@ -157,13 +155,13 @@ function restartGame()
     unset($_SESSION['difficultyLevel']);
     unset($_SESSION['playerName']);
     unset($_SESSION['playerId']);
+    unset($_SESSION['lettersTried']);
 
-    // Redirect to home.php
     header("Location: home.php");
     exit();
 }
 
-// Fonction pour dessiner le pendu en fonction du nombre de tentatives restantes
+// fonction pour dessiner le pendu en fonction du nombre de tentatives restantes
 function drawHangman($triesLeft)
 {
     switch ($triesLeft) {
@@ -286,50 +284,43 @@ function drawHangman($triesLeft)
     }
 }
 
-// Check if the restart button was clicked
+// verifie si le bouton pour relancer la partie a ete clique
 if (isset($_POST['restart']) && $_POST['restart'] === "true") {
-    // Reset session variables
     restartGame();
 }
 ?>
 
 <?php if (!$playerCreated) : ?>
-    <!-- Player name form -->
+    <!-- choisir nom joueur -->
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-        <label for="playerName" class="form-label">Enter your name</label>
+        <label for="playerName" class="form-label">Entrez votre nom</label>
         <input type="text" class="form-control" id="playerName" name="playerName" required>
         <input type="hidden" name="difficultyLevel" value="<?php echo htmlspecialchars($difficultyLevel); ?>">
-        <button type="submit" class="btn btn-primary mt-2">Start the game</button>
+        <button type="submit" class="btn btn-primary mt-2">Lancer la partie</button>
     </form>
 <?php elseif (isset($gameResult) && ($gameResult === "win" || $gameResult === "lose")) : ?>
-    <!-- Display winning or losing message -->
-    <h1><?php echo $gameResult === "win" ? "Congratulations!" : "Game Over!"; ?></h1>
-    <p><?php echo $gameResult === "win" ? "You've guessed the word correctly: $randomWord" : "Sorry, you've run out of tries. The word was: $randomWord"; ?></p>
-    <!-- Restart game button -->
+    <!-- afficher victoire ou defaite -->
+    <h1><?php echo $gameResult === "win" ? "Félicitations!" : "Game Over!"; ?></h1>
+    <p><?php echo $gameResult === "win" ? "Vous avez deviné le mot: $randomWord" : "Désolé vous n'avez plus d'essais restants. Le mot était: $randomWord"; ?></p>
+    <!-- bouton pour relancer la partie -->
     <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
         <input type="hidden" name="restart" value="true">
-        <button type="submit" class="btn btn-primary">Restart Game</button>
+        <button type="submit" class="btn btn-primary">Commencer une nouvelle partie</button>
     </form>
 <?php else : ?>
-    <!-- Display the game interface -->
-    <h1>Test</h1>
-    <?php
-    echo "Player Name: " . $playerName . "<br>";
-    echo "Difficulty Level: " . $difficultyLevel . "<br>";
-    echo "Random Word: " . $randomWord . "<br>";
-    echo "Remaining Tries: " . $try . "<br>";
-    echo "Hidden Word: " . $hiddenWordString;
-    ?>
-    <!-- Add game UI elements here -->
     <div class="displayGame">
-        <!-- Input field for the player to guess a letter -->
-        <!-- Dessiner le pendu en fonction du nombre de tentatives restantes -->
-        <?php drawHangman($try); ?>
+        <?php
+        echo "Niveau de difficulté: " . $difficultyLevel . "<br>";
+        echo "Essais restants: " . $try . "<br>";
+        echo $hiddenWordString;
+        // dessine le pendu en fonction du nombre de tentatives restantes
+        drawHangman($try); ?>
+        <!-- champ pour entrer une lettre -->
         <form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
             <input type="hidden" name="playerName" value="<?php echo htmlspecialchars($playerName); ?>">
             <input type="hidden" name="difficultyLevel" value="<?php echo htmlspecialchars($difficultyLevel); ?>">
             <input type="text" name="guessedLetter" placeholder="Enter a letter">
-            <button type="submit">Guess</button>
+            <button type="submit">Entrer</button>
         </form>
     </div>
 <?php endif; ?>
