@@ -57,7 +57,7 @@ if (isset($_GET['difficultyLevel'])) {
         <button name="difficultyLevel" value="hard" type="submit">hard</button>
         <input type="hidden" name="submit" value="true"> <!-- Hidden input to submit form -->
     </form>
-    <a class="btn btn-primary" href="scoreboard.php" role="button">Link</a>
+    <a class="btn btn-primary" href="scoreboard.php" role="button">Classement</a>
 </div>
 
 
