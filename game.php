@@ -55,7 +55,15 @@ if (isset($_SESSION['randomWord'])) {
 // demande le nom et stocke le nom dans la bdd
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['playerName'])) {
     $playerName = $_POST['playerName'];
+    if (!preg_match("/^[a-zA-Z ]*$/", $playerName)) {
+        echo "Le nom du joueur ne peut contenir que des lettres et des espaces!";
+        exit;
+    }
 
+    if (strlen($playerName) > 20) {
+        echo "Le nom du joueur est trop long!";
+        exit;
+    }
     // verifie si le joueur existe deja
     if (!empty($playerName)) {
         $stmt = $mysqlClient->prepare("SELECT pla_id FROM players WHERE pla_name = ?");
@@ -85,6 +93,10 @@ $lettersTried = isset($_SESSION['lettersTried']) ? $_SESSION['lettersTried'] : a
 // verifie les lettres entrees
 if (isset($_POST['guessedLetter'])) {
     $guessedLetter = strtoupper($_POST['guessedLetter']);
+    if (strlen($guessedLetter) !== 1 || !ctype_alpha($guessedLetter)) {
+        echo "Veuillez entrer une seule lettre!";
+        exit;
+    }
     // verifie si la lettre a deja ete utilisee
     if (in_array($guessedLetter, $lettersTried)) {
     } else {
