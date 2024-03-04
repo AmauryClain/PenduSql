@@ -1,10 +1,11 @@
 <?php
+session_start();
 include 'elements/header.php';
 include 'connexion.php';
 
 @$submit =  $_GET['submit'];
 @$difficultyLevel = $_GET['difficultyLevel'];
-
+$_SESSION['difficultyLevel'] = $difficultyLevel;
 
 // Vérifiez si le formulaire est soumis et que le niveau de difficulté est sélectionné
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($submit) && isset($difficultyLevel)) {
@@ -56,7 +57,9 @@ if (isset($_GET['difficultyLevel'])) {
         <button name="difficultyLevel" value="hard" type="submit">hard</button>
         <input type="hidden" name="submit" value="true"> <!-- Hidden input to submit form -->
     </form>
+    <a class="btn btn-primary" href="scoreboard.php" role="button">Link</a>
 </div>
+
 
 <?php
 
