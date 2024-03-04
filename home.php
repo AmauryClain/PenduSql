@@ -14,7 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($submit) && isset($difficultyLe
 }
 ?>
 <div class="difficulty-container">
-    <h1>Choose the difficulty of the game</h1>
+    <h1>Choisissez la difficulté du jeu</h1>
     <form method="GET" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
         <button name="difficultyLevel" value="easy" type="submit">facile</button>
         <button name="difficultyLevel" value="medium" type="submit">moyen</button>
