@@ -8,7 +8,7 @@ $difficultyLevel = $_GET['difficultyLevel'] ?? '';
 // Affichez le contenu en fonction du niveau de difficulté récupéré
 if ($difficultyLevel == "easy") {
     include 'connexion.php';
-    $res = $mysqlClient->prepare('SELECT w.wrd_word FROM words w WHERE CHAR_LENGTH(w.wrd_word) <= 4');
+    $res = $mysqlClient->prepare('SELECT w.wrd_word FROM words w WHERE CHAR_LENGTH(w.wrd_word) <= 6');
     $res->execute();
     $words = $res->fetchAll();
     foreach ($words as $word) {
@@ -16,7 +16,7 @@ if ($difficultyLevel == "easy") {
     }
 } elseif ($difficultyLevel == "medium") {
     include 'connexion.php';
-    $res = $mysqlClient->prepare('SELECT w.wrd_word FROM words w WHERE CHAR_LENGTH(w.wrd_word) <= 6 AND CHAR_LENGTH(w.wrd_word) > 4');
+    $res = $mysqlClient->prepare('SELECT w.wrd_word FROM words w WHERE CHAR_LENGTH(w.wrd_word) <= 8 AND CHAR_LENGTH(w.wrd_word) >= 6');
     $res->execute();
     $words = $res->fetchAll();
     foreach ($words as $word) {
@@ -32,7 +32,10 @@ if ($difficultyLevel == "easy") {
     }
 }
 ?>
-
+<div class="usernameInput">
+    <h1>Entrez votre nom</h1>
+    
+</div>
 <?php
 include 'elements/footer.php';
 ?>
