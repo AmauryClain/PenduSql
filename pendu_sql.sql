@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:8889
--- Generation Time: Feb 27, 2024 at 07:09 PM
+-- Generation Time: Mar 04, 2024 at 04:08 PM
 -- Server version: 5.7.24
 -- PHP Version: 8.0.1
 
@@ -20,6 +20,92 @@ SET time_zone = "+00:00";
 --
 -- Database: `pendu_sql`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `players`
+--
+
+CREATE TABLE `players` (
+  `pla_id` int(11) NOT NULL,
+  `pla_name` varchar(100) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `players`
+--
+
+INSERT INTO `players` (`pla_id`, `pla_name`) VALUES
+(191, 'test9'),
+(192, 'test'),
+(193, 'tesssst'),
+(194, 'fegrth'),
+(195, 'rhgd'),
+(196, 'fdzfgb'),
+(197, 'glterhtrhtrthr'),
+(198, 'fzdbdgfgfgjyt'),
+(199, 'a'),
+(200, 'jambon'),
+(201, 'tt'),
+(202, 'ezffezf'),
+(203, 'tsfegtrethutjity'),
+(204, 'j\'ai pas de nom'),
+(205, 'gg'),
+(206, 'bonsoir'),
+(207, 'yyyreyh'),
+(208, 't'),
+(209, 'e'),
+(210, 'ngvrrtg'),
+(211, 'capitaineflamme'),
+(212, 'bonjouur');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `player_stats`
+--
+
+CREATE TABLE `player_stats` (
+  `pls_id` int(11) NOT NULL,
+  `pla_id` int(11) NOT NULL,
+  `pls_win` text NOT NULL,
+  `pls_difficulty` varchar(12) NOT NULL,
+  `pls_date` datetime NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Dumping data for table `player_stats`
+--
+
+INSERT INTO `player_stats` (`pls_id`, `pla_id`, `pls_win`, `pls_difficulty`, `pls_date`) VALUES
+(1, 192, 'win', 'easy', '2024-03-04 13:06:50'),
+(2, 192, 'win', 'easy', '2024-03-04 13:06:59'),
+(3, 192, 'win', 'medium', '2024-03-04 13:07:34'),
+(4, 192, 'win', 'hard', '2024-03-04 13:08:31'),
+(5, 191, 'win', 'easy', '2024-03-04 13:57:45'),
+(6, 198, 'win', 'hard', '2024-03-04 13:58:12'),
+(7, 192, 'win', 'easy', '2024-03-04 13:58:55'),
+(8, 191, 'lose', 'medium', '2024-03-04 13:59:23'),
+(9, 191, 'win', 'easy', '2024-03-04 14:44:16'),
+(10, 200, 'win', 'easy', '2024-03-04 14:44:34'),
+(11, 201, 'lose', 'easy', '2024-03-04 15:17:59'),
+(12, 191, 'lose', 'medium', '2024-03-04 15:19:34'),
+(13, 202, 'lose', 'hard', '2024-03-04 15:22:32'),
+(14, 203, 'lose', 'easy', '2024-03-04 15:23:12'),
+(15, 204, 'win', 'easy', '2024-03-04 15:23:52'),
+(16, 205, 'win', 'easy', '2024-03-04 15:31:48'),
+(17, 191, 'lose', 'easy', '2024-03-04 15:48:53'),
+(18, 207, 'lose', 'easy', '2024-03-04 15:49:18'),
+(19, 200, 'lose', 'hard', '2024-03-04 15:50:06'),
+(20, 209, 'lose', 'medium', '2024-03-04 15:51:20'),
+(21, 206, 'win', 'easy', '2024-03-04 15:52:36'),
+(22, 209, 'lose', 'easy', '2024-03-04 15:53:33'),
+(23, 209, 'lose', 'hard', '2024-03-04 15:56:57'),
+(24, 206, 'win', 'easy', '2024-03-04 15:57:20'),
+(25, 210, 'win', 'medium', '2024-03-04 15:58:03'),
+(26, 211, 'lose', 'hard', '2024-03-04 15:59:45'),
+(27, 206, 'lose', 'easy', '2024-03-04 16:00:13');
 
 -- --------------------------------------------------------
 
@@ -818,20 +904,55 @@ INSERT INTO `words` (`wrd_id`, `wrd_word`) VALUES
 --
 
 --
+-- Indexes for table `players`
+--
+ALTER TABLE `players`
+  ADD PRIMARY KEY (`pla_id`);
+
+--
+-- Indexes for table `player_stats`
+--
+ALTER TABLE `player_stats`
+  ADD PRIMARY KEY (`pls_id`),
+  ADD KEY `pla_id` (`pla_id`);
+
+--
 -- Indexes for table `words`
 --
 ALTER TABLE `words`
-  ADD PRIMARY KEY (`wrd_id`);
+  ADD PRIMARY KEY (`wrd_id`) USING BTREE;
 
 --
 -- AUTO_INCREMENT for dumped tables
 --
 
 --
+-- AUTO_INCREMENT for table `players`
+--
+ALTER TABLE `players`
+  MODIFY `pla_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=213;
+
+--
+-- AUTO_INCREMENT for table `player_stats`
+--
+ALTER TABLE `player_stats`
+  MODIFY `pls_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+
+--
 -- AUTO_INCREMENT for table `words`
 --
 ALTER TABLE `words`
   MODIFY `wrd_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=776;
+
+--
+-- Constraints for dumped tables
+--
+
+--
+-- Constraints for table `player_stats`
+--
+ALTER TABLE `player_stats`
+  ADD CONSTRAINT `player_stats_ibfk_1` FOREIGN KEY (`pla_id`) REFERENCES `players` (`pla_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
