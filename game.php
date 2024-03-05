@@ -6,24 +6,6 @@ include 'connexion.php';
 // recupere le niveau de difficulté grace a la session
 $difficultyLevel = $_SESSION['difficultyLevel'];
 
-<<<<<<< HEAD
-// Affichez le contenu en fonction du niveau de difficulté récupéré
-if ($difficultyLevel == "easy") {
-    include 'connexion.php';
-    $res = $mysqlClient->prepare('SELECT w.wrd_word FROM words w WHERE CHAR_LENGTH(w.wrd_word) <= 6');
-    $res->execute();
-    $words = $res->fetchAll();
-    foreach ($words as $word) {
-        echo $word['wrd_word'];
-    }
-} elseif ($difficultyLevel == "medium") {
-    include 'connexion.php';
-    $res = $mysqlClient->prepare('SELECT w.wrd_word FROM words w WHERE CHAR_LENGTH(w.wrd_word) <= 8 AND CHAR_LENGTH(w.wrd_word) >= 6');
-    $res->execute();
-    $words = $res->fetchAll();
-    foreach ($words as $word) {
-        echo $word['wrd_word'];
-=======
 // initialiser les variables
 $playerCreated = false;
 $try = isset($_SESSION['try']) ? $_SESSION['try'] : 8;
@@ -76,7 +58,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['playerName'])) {
     if (!preg_match("/^[a-zA-Z ]*$/", $playerName)) {
         echo "Le nom du joueur ne peut contenir que des lettres et des espaces!";
         exit;
->>>>>>> f07e70e2a8a451105d9b8fbae751465623700407
     }
 
     if (strlen($playerName) > 20) {
@@ -320,15 +301,6 @@ if (isset($_POST['restart']) && $_POST['restart'] === "true") {
     restartGame();
 }
 ?>
-<<<<<<< HEAD
-<div class="usernameInput">
-    <h1>Entrez votre nom</h1>
-    
-</div>
-<?php
-include 'elements/footer.php';
-?>
-=======
 
 <?php if (!$playerCreated) : ?>
     <!-- choisir nom joueur -->
@@ -366,4 +338,3 @@ include 'elements/footer.php';
 <?php endif; ?>
 
 <?php include 'elements/footer.php'; ?>
->>>>>>> f07e70e2a8a451105d9b8fbae751465623700407
